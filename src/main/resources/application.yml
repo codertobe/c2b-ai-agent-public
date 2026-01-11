@@ -25,10 +25,10 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
-logging:
-  level:
-    # 开启 Spring AI 的日志
-    org.springframework.ai: DEBUG
-    # 开启 HTTP 客户端日志（如果是用的 RestTemplate 或 WebClient）
-    org.springframework.web.client: DEBUG
-    # 如果你使用了 OkHttp 或其他底层 HTTP 客户端，也需要开启
+#logging:
+#  level:
+#    # 开启 Spring AI 的日志
+#    org.springframework.ai: DEBUG
+#    # 开启 HTTP 客户端日志（如果是用的 RestTemplate 或 WebClient）
+#    org.springframework.web.client: DEBUG
+#    # 如果你使用了 OkHttp 或其他底层 HTTP 客户端，也需要开启
