@@ -2,17 +2,20 @@ package com.c2b.c2baiagent.app;
 
 import com.c2b.c2baiagent.advisor.MyLoggerAdvisor;
 import com.c2b.c2baiagent.chatmemory.FileBasedChatMemory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 /**
@@ -99,5 +102,26 @@ public class ParentChildApp {
                 .entity(ChatReport.class);
         log.info("chatReport: {}", chatReport);
         return chatReport;
+    }
+    @Resource
+    private VectorStore parentChildAppVectorStore;
+    @Resource
+    private Advisor parentChildAppRagCloudAdvisor;
+    public String doChatWithRag(String message, String chatId) {
+        ChatResponse chatResponse = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                // 开启日志，便于观察效果
+//                .advisors(new MyLoggerAdvisor())
+                // 应用知识库问答
+                .advisors(QuestionAnswerAdvisor.builder(parentChildAppVectorStore).build())
+                // 应用增强检索服务（云知识库服务）
+//                .advisors(parentChildAppRagCloudAdvisor)
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
     }
 }

@@ -44,4 +44,13 @@ class ParentChildAppTest {
         ParentChildApp.ChatReport chatReport = parentChildApp.doChatWithReport(message, chatId);
         Assertions.assertNotNull(chatReport);
     }
+
+    @Test
+    void doChatWithRag() {
+        String chatId = UUID.randomUUID().toString();
+        String message = "单亲孩子被同学议论家庭情况，开始变得少言寡语，怎么办呢？";
+        String answer = parentChildApp.doChatWithRag(message, chatId);
+        Assertions.assertNotNull(answer);
+    }
+
 }
