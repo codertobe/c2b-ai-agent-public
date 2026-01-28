@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * ClassName: ParentChildAppRagCloudAdvisorConfig
  * Package: com.c2b.c2baiagent.rag
- * Description:
+ * Description: 初始化基于云知识库的检索增强顾问 Bean
  *
  * @Author lzy
  */

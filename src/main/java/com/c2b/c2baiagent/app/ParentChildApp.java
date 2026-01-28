@@ -2,6 +2,8 @@ package com.c2b.c2baiagent.app;
 
 import com.c2b.c2baiagent.advisor.MyLoggerAdvisor;
 import com.c2b.c2baiagent.chatmemory.FileBasedChatMemory;
+import com.c2b.c2baiagent.rag.ParentChildAppRagCustomAdvisorFactory;
+import com.c2b.c2baiagent.rag.QueryRewriter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -107,10 +109,17 @@ public class ParentChildApp {
     private VectorStore parentChildAppVectorStore;
     @Resource
     private Advisor parentChildAppRagCloudAdvisor;
+    @Resource
+    private VectorStore pgVectorVectorStore;
+    @Resource
+    private QueryRewriter queryRewriter;
     public String doChatWithRag(String message, String chatId) {
+        // 查询重写
+        String rewrittenMessage = queryRewriter.doQueryRewrite(message);
         ChatResponse chatResponse = chatClient
                 .prompt()
-                .user(message)
+//                .user(message)
+                .user(rewrittenMessage)
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 // 开启日志，便于观察效果
 //                .advisors(new MyLoggerAdvisor())
@@ -118,6 +127,14 @@ public class ParentChildApp {
                 .advisors(QuestionAnswerAdvisor.builder(parentChildAppVectorStore).build())
                 // 应用增强检索服务（云知识库服务）
 //                .advisors(parentChildAppRagCloudAdvisor)
+                // 应用 RAG 检索增强服务（基于 PgVector 向量存储）
+//                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                // 应用自定义的 RAG 检索增强服务（文档查询器 + 上下文增强器）
+                /*.advisors(
+                        ParentChildAppRagCustomAdvisorFactory.createParentChildAppRagCustomAdvisor(
+                                parentChildAppVectorStore, "单亲"
+                        )
+                )*/
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @Author lzy
  */
-@Configuration
+//@Configuration
 public class ParentChildAppVectorStoreConfig {
 
     @Resource
